@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Book Offer</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        .form-container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <a class="navbar-brand" th:href="@{/user/dashboard}">SocialBookstore</a>
+    </nav>
+    <div class="form-container">
+        <h2 class="text-center mb-4">Add Book Offer</h2>
+        <form th:action="@{/user/addBook}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="form-group">
+                <label for="title">Book Title:</label>
+                <input type="text" class="form-control" id="title" name="title" required>
+            </div>
+            <div class="form-group">
+                <label for="authorNames">Author(s):</label>
+                <div id="authorFields">
+                    <input type="text" class="form-control mb-2" name="authorNames" placeholder="Enter author name" required>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addAuthorField()">Add another author</button>
+            </div>
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select class="form-control" id="category" name="categoryId" required>
+                    <option value="">Select a Category</option>
+                    <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.name}"></option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="summary">Summary:</label>
+                <textarea class="form-control" id="summary" name="summary" rows="3" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function addAuthorField() {
+        const div = document.createElement('div');
+        div.className = 'form-group';
+        div.innerHTML = '<input type="text" class="form-control mb-2" name="authorNames" placeholder="Enter author name" required>';
+        document.getElementById('authorFields').appendChild(div);
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

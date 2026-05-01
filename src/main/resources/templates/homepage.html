@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+
+    <title>Homepage</title>
+
+    <style>
+        body {
+            padding-top: 50px;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .role-info {
+            margin-bottom: 30px;
+        }
+
+        .btn-group {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 welcome-message">
+                <h2 class="display-4">Welcome to Homepage</h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 text-center">
+                <div sec:authorize="hasRole('ROLE_ANONYMOUS')">
+                    <div class="btn-group btn-group-lg" role="group" aria-label="Anonymous Actions">
+                        <a th:href="@{/signin}" class="btn btn-primary">Login</a>
+                        <a th:href="@{/register}" class="btn btn-secondary">Register</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" sec:authorize="isAuthenticated()">
+            <div class="col-12 text-center">
+                <div class="role-info">
+                    <h4>Logged in as: <span sec:authentication="name"></span></h4>
+                    <h4>Role: <span sec:authentication="authorities"></span></h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" sec:authorize="isAuthenticated()">
+            <div class="col-12 text-center">
+                <div sec:authorize="hasAuthority('USER')" class="btn-group btn-group-lg" role="group" aria-label="User Actions">
+                    <a th:href="@{/user/dashboard}" class="btn btn-primary">User Dashboard</a>
+                    <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+                </div>
+                <div sec:authorize="hasAuthority('ADMIN')" class="btn-group btn-group-lg" role="group" aria-label="Admin Actions">
+                    <a th:href="@{/admin/dashboard}" class="btn btn-primary">Admin Dashboard</a>
+                    <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvvhxxDsw0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAi2Fvo5Lc/fPXYF+hEtnyZHnSNE9twXds6LkM39KM3c41mweSwq0MRxaErzs4R" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+6aFw5t1K6LZZ0iO+M86deH9wfyjLrDg2uC29mg2ftW8anD3GP+uaaw9T" crossorigin="anonymous"></script>
+</body>
+
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Book Requests</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h2>My Book Requests</h2>
+    <div th:if="${#lists.isEmpty(bookRequests)}">
+        <p>No book requests found.</p>
+    </div>
+    <div th:if="${!#lists.isEmpty(bookRequests)}">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Title</th>
+                <th>Summary</th>
+                <th>Category</th>
+                <th>Authors</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${bookRequests}">
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.summary}"></td>
+                <td th:text="${book.bookCategory.name}"></td>
+                <td th:text="${#strings.join(book.bookAuthors, ', ')}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
