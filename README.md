@@ -31,7 +31,7 @@ Users can browse available books, manage offers, and interact with other users.
 
 <img src="Screenshots/dashboard.png" width="600">
 
-```md
+
 ## ⚙️ How to Run
 
 ### 1. Clone the repository
