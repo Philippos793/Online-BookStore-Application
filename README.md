@@ -16,8 +16,19 @@ and interact with other users.
 
 ## Application Preview
 
+### 🔐 Login Page
+Users can log in using their credentials or navigate to the registration page.
+
 <img src="Screenshots/login.png" width="600">
+
+### 📝 Register Page
+New users can create an account by providing their details and selecting preferred categories.
+
 <img src="Screenshots/register.png" width="600">
+
+### 📚 Dashboard
+Users can browse available books, manage offers, and interact with other users.
+
 <img src="Screenshots/dashboard.png" width="600">
 
 ## Technologies Used
