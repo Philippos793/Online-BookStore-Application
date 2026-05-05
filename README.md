@@ -14,6 +14,12 @@ and interact with other users.
 - HTML-based user interface
 - MySQL database integration
 
+## Application Preview
+
+<img src="screenshots/login.png" width="600">
+<img src="screenshots/register.png" width="600">
+<img src="screenshots/dashboard.png" width="600">
+
 ## Technologies Used
 
 - Java
