@@ -16,9 +16,9 @@ and interact with other users.
 
 ## Application Preview
 
-<img src="screenshots/login.png" width="600">
-<img src="screenshots/register.png" width="600">
-<img src="screenshots/dashboard.png" width="600">
+<img src="Screenshots/login.png" width="600">
+<img src="Screenshots/register.png" width="600">
+<img src="Screenshots/dashboard.png" width="600">
 
 ## Technologies Used
 
