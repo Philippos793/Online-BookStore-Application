@@ -38,33 +38,46 @@ Users can browse available books, manage offers, and interact with other users.
 
 ```bash
 git clone https://github.com/Philippos793/Online-BookStore-Application.git
-2. Create the MySQL database
+```
+
+### 2. Create the MySQL database
 
 Before running the application, create the required database:
 
+```sql
 CREATE DATABASE IF NOT EXISTS secure_users_directory;
+```
 
 You can also find this script in:
 
-database/init.sql
+`database/init.sql`
 
-3. Configure database credentials
+### 3. Configure database credentials
 
 Open:
 
-src/main/resources/application.properties
+`src/main/resources/application.properties`
 
 and update the following fields with your local MySQL credentials:
 
+```properties
 spring.datasource.username=YOUR_USERNAME
 spring.datasource.password=YOUR_PASSWORD
-4. Run the application
+```
+
+### 4. Run the application
 
 For Windows:
 
+```bat
 mvnw.cmd spring-boot:run
-5. Open in browser
+```
+
+### 5. Open in browser
+
+```text
 http://localhost:8080
+```
 
 ## Technologies Used
 
