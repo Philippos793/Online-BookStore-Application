@@ -31,44 +31,43 @@ Users can browse available books, manage offers, and interact with other users.
 
 <img src="Screenshots/dashboard.png" width="600">
 
-
+```md
 ## ⚙️ How to Run
 
-1. Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Philippos793/Online-BookStore-Application.git
 
-2. Create the MySQL database
+### 2. Create the MySQL database
 
 Before running the application, create the required database:
 
-```md
 ```sql
 CREATE DATABASE IF NOT EXISTS secure_users_directory;
 
-You can also find this script in: database/init.sql
+You can also find this script in:
 
-3. Configure database credentials
+database/init.sql
+
+### 3. Configure database credentials
 
 Open: src/main/resources/application.properties
 
 and update the following fields with your local MySQL credentials:
 
-```md
 ```properties
 spring.datasource.username=YOUR_USERNAME
 spring.datasource.password=YOUR_PASSWORD
 
-4. Run the application
+### 4. Run the application
 
 For Windows:
 
-```md
 ```bat
 mvnw.cmd spring-boot:run
 
-5. Open in browser
+### 5. Open in browser
 
 http://localhost:8080 
 
