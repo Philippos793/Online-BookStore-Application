@@ -95,5 +95,7 @@ and data access logic to improve maintainability and code organization.
 
 ## Project Context
 
-This project was developed for a university course focused on the design and implementation of web
-applications, applying software engineering principles and development best practices.
+## Project Context
+
+This project was developed as part of academic coursework,
+applying real-world software engineering principles and full-stack development practices.
