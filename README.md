@@ -48,9 +48,10 @@ Before running the application, create the required database:
 CREATE DATABASE IF NOT EXISTS secure_users_directory;
 ```
 
-You can also find this script in:
+Run the initialization scripts:
 
 `database/init.sql`
+`database/data.sql`
 
 ### 3. Configure database credentials
 
@@ -92,6 +93,7 @@ http://localhost:8080
 
 The application follows an MVC-based structure, separating controllers, views, models, services,
 and data access logic to improve maintainability and code organization.
+
 
 ## Project Context
 
