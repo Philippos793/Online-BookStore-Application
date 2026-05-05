@@ -95,7 +95,5 @@ and data access logic to improve maintainability and code organization.
 
 ## Project Context
 
-## Project Context
-
 This project was developed as part of academic coursework,
 applying real-world software engineering principles and full-stack development practices.
