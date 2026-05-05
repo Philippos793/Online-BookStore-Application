@@ -1,8 +1,8 @@
 # Online Bookstore Web Application
 
-A full-stack web application developed as part of a university software development project.  
-The application allows users to create accounts, manage profiles, offer books, search for available books,
-and interact with other users.
+A full-stack web application developed using **Java Spring Boot** that allows users to interact
+with a digital bookstore environment. Users can register, manage their profiles, browse books,
+and interact with other users through a clean and structured interface.
 
 ## Features
 
@@ -30,6 +30,47 @@ New users can create an account by providing their details and selecting preferr
 Users can browse available books, manage offers, and interact with other users.
 
 <img src="Screenshots/dashboard.png" width="600">
+
+
+## ⚙️ How to Run
+
+1. Clone the repository
+
+```bash
+git clone https://github.com/Philippos793/Online-BookStore-Application.git
+
+2. Create the MySQL database
+
+Before running the application, create the required database:
+
+```md
+```sql
+CREATE DATABASE IF NOT EXISTS secure_users_directory;
+
+You can also find this script in: database/init.sql
+
+3. Configure database credentials
+
+Open: src/main/resources/application.properties
+
+and update the following fields with your local MySQL credentials:
+
+```md
+```properties
+spring.datasource.username=YOUR_USERNAME
+spring.datasource.password=YOUR_PASSWORD
+
+4. Run the application
+
+For Windows:
+
+```md
+```bat
+mvnw.cmd spring-boot:run
+
+5. Open in browser
+
+http://localhost:8080 
 
 ## Technologies Used
 
