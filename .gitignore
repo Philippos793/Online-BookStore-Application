@@ -42,3 +42,8 @@ Thumbs.db
 ### Environment / secrets ###
 .env
 application-local.properties
+
+### Build output / IDE leftovers ###
+bin/
+.vs/
+*.rar

@@ -8,6 +8,8 @@
 <body>
 <div class="container">
     <h2>Users Requesting Your Book</h2>
+    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
     <div th:if="${#lists.isEmpty(requestingUsers)}">
         <p>No users found.</p>
     </div>
@@ -27,7 +29,11 @@
                 <td th:text="${user.fullName}"></td>
                 <td th:text="${user.email}"></td>
                 <td>
-                    <a th:href="@{/user/acceptRequest(bookId=${bookId}, username=${user.username})}" class="btn btn-success">Accept</a>
+                    <form th:action="@{/user/acceptRequest}" method="post">
+                        <input type="hidden" name="bookId" th:value="${bookId}" />
+                        <input type="hidden" name="username" th:value="${user.username}" />
+                        <button type="submit" class="btn btn-success">Accept</button>
+                    </form>
                 </td>
             </tr>
             </tbody>

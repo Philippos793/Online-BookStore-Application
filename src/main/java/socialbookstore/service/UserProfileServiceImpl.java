@@ -1,253 +1,208 @@
 package socialbookstore.service;
 
 import java.util.ArrayList;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-
-import jakarta.transaction.Transactional;
 import socialbookstore.domainmodel.Book;
 import socialbookstore.domainmodel.BookAuthor;
 import socialbookstore.domainmodel.BookCategory;
-import socialbookstore.domainmodel.User;
 import socialbookstore.domainmodel.UserProfile;
 import socialbookstore.formsdata.SearchFormData;
 import socialbookstore.mappers.BookAuthorMapper;
 import socialbookstore.mappers.BookCategoryMapper;
 import socialbookstore.mappers.BookMapper;
-import socialbookstore.mappers.UserDAO;
 import socialbookstore.mappers.UserProfileMapper;
 
 @Service
 public class UserProfileServiceImpl implements UserProfileService {
 
-    @Autowired
-    private UserProfileMapper userProfileMapper;
-
-    @Autowired
-    private BookAuthorMapper bookAuthorMapper;
-
-    @Autowired
-    private BookCategoryMapper bookCategoriesMapper;
-
-    @Autowired
-    private BookMapper bookMapper;
-  
-    @Autowired
-    private ExactSearchStrategy exactSearchStrategy;
-    @Autowired
-    private AsyncEmailService asyncEmailService;
-    @Autowired
-    private ApproximateSearchStrategy approximateSearchStrategy;
-    
     private static final Logger logger = LoggerFactory.getLogger(UserProfileServiceImpl.class);
 
+    private final UserProfileMapper userProfileMapper;
+    private final BookAuthorMapper bookAuthorMapper;
+    private final BookCategoryMapper bookCategoryMapper;
+    private final BookMapper bookMapper;
+    private final ExactSearchStrategy exactSearchStrategy;
+    private final ApproximateSearchStrategy approximateSearchStrategy;
+    private final AsyncEmailService asyncEmailService;
 
+    public UserProfileServiceImpl(UserProfileMapper userProfileMapper, BookAuthorMapper bookAuthorMapper,
+            BookCategoryMapper bookCategoryMapper, BookMapper bookMapper, ExactSearchStrategy exactSearchStrategy,
+            ApproximateSearchStrategy approximateSearchStrategy, AsyncEmailService asyncEmailService) {
+        this.userProfileMapper = userProfileMapper;
+        this.bookAuthorMapper = bookAuthorMapper;
+        this.bookCategoryMapper = bookCategoryMapper;
+        this.bookMapper = bookMapper;
+        this.exactSearchStrategy = exactSearchStrategy;
+        this.approximateSearchStrategy = approximateSearchStrategy;
+        this.asyncEmailService = asyncEmailService;
+    }
 
     @Override
     public UserProfile retrieveProfile(String username) {
-        // Retrieve and return user profile data
         return userProfileMapper.findByUsername(username);
     }
+
     @Override
     public void save(UserProfile userProfile) {
-        // Save user profile data
         userProfileMapper.save(userProfile);
     }
+
+    @Override
     public List<BookCategory> findAllCategories() {
-        return bookCategoriesMapper.findAll();
+        return bookCategoryMapper.findAll();
     }
-   
+
+    @Override
     public List<BookAuthor> findAllAuthors() {
         return bookAuthorMapper.findAll();
     }
+
+    @Override
+    public Optional<BookCategory> findCategoryById(Integer categoryId) {
+        return bookCategoryMapper.findById(categoryId);
+    }
+
     @Override
     @Transactional
     public void addBookOffer(String username, Book book) {
-        logger.info("Adding book for user: {}", username);
-        UserProfile userProfile = userProfileMapper.findByUsername(username);
-        if (userProfile == null) {
-            throw new IllegalArgumentException("No user found with username: " + username);
-        }
-
+        UserProfile userProfile = requireProfile(username);
         book.setUserProfile(userProfile);
-        logger.info("Setting user profile for book: {}", userProfile.getUsername());
+
+        // Reuse existing authors by name, create the missing ones
         List<BookAuthor> managedAuthors = new ArrayList<>();
         for (BookAuthor author : book.getBookAuthors()) {
-            List<BookAuthor> authors = bookAuthorMapper.findByName(author.getName());
-            BookAuthor managedAuthor;
-            if (authors.isEmpty()) {
-                managedAuthor = bookAuthorMapper.save(author);
-            } else {
-                managedAuthor = authors.get(0);
-            }
-            managedAuthors.add(managedAuthor);
+            List<BookAuthor> existing = bookAuthorMapper.findByName(author.getName());
+            managedAuthors.add(existing.isEmpty() ? bookAuthorMapper.save(author) : existing.get(0));
         }
         book.setBookAuthors(managedAuthors);
 
         userProfile.getBookOffers().add(book);
-
-        userProfileMapper.save(userProfile); // Save the updated user profile
-        bookMapper.save(book); // Save the book
-
-        logger.info("Book saved successfully for user: {}", username);
+        bookMapper.save(book);
+        logger.info("Book '{}' added for user: {}", book.getTitle(), username);
     }
+
     @Override
+    @Transactional(readOnly = true)
     public List<Book> retrieveBookOffers(String username) {
         UserProfile userProfile = userProfileMapper.findByUsername(username);
-        if (userProfile != null) {
-            List<Book> books = userProfile.getBookOffers();
-            for (Book book : books) {
-                Hibernate.initialize(book.getBookAuthors()); // Ensure authors are loaded
-                Hibernate.initialize(book.getBookCategory()); // Ensure category is loaded
-
-            }
-            return books;
+        if (userProfile == null) {
+            return Collections.emptyList();
         }
-        return Collections.emptyList();    }
-    
-    
-    
-    public Optional<BookCategory> findCategoryById(Integer categoryId) {
-        return bookCategoriesMapper.findById(categoryId);
+        List<Book> books = userProfile.getBookOffers();
+        books.forEach(book -> Hibernate.initialize(book.getBookAuthors()));
+        return books;
     }
-    
+
     @Override
     @Transactional
     public void deleteBookOffer(String username, int bookId) {
-        logger.info("Deleting book with ID: {} for user: {}", bookId, username);
-
-        UserProfile userProfile = userProfileMapper.findByUsername(username);
-        if (userProfile != null) {
-            List<Book> bookOffers = userProfile.getBookOffers();
-            logger.debug("User {} has {} book offers before deletion.", username, bookOffers.size());
-
-            Book bookToRemove = null;
-            for (Book book : bookOffers) {
-                if (book.getBookId() == bookId) {
-                    bookToRemove = book;
-                    break;
-                }
-            }
-            if (bookToRemove != null) {
-                logger.debug("Found book with ID: {} for user: {}. Removing book.", bookId, username);
-
-                bookOffers.remove(bookToRemove);
-                userProfile.setBookOffers(bookOffers);
-                bookToRemove.setUserProfile(null); // Clear the user profile reference from the book
-                bookMapper.delete(bookToRemove); // Delete the book from the database
-                userProfileMapper.save(userProfile); // Save the updated user profile
-
-                logger.info("Book with ID: {} removed successfully for user: {}", bookId, username);
-
-                logger.info("Book removed successfully for user: {}", username);
-            } else {
-                throw new IllegalArgumentException("Book not found in user's offers.");
-            }
-        } else {
-            throw new IllegalArgumentException("No user found with username: " + username);
-        }
+        Book book = findOwnedBook(bookId, username);
+        book.getUserProfile().getBookOffers().remove(book);
+        book.getRequestingUsers().clear();
+        bookMapper.delete(book);
+        logger.info("Book with ID: {} removed for user: {}", bookId, username);
     }
-    @Override
-    public ArrayList<Book> searchBooks(SearchFormData searchFormData) {
-        SearchStrategy searchStrategy = determineSearchStrategy(searchFormData.isExactMatch());
-        return searchStrategy.search(searchFormData, bookMapper);
-    }
-
-    private SearchStrategy determineSearchStrategy(boolean exactMatch) {
-        return exactMatch ? exactSearchStrategy : approximateSearchStrategy;
-    }
-
-    
-    @Override
-    @Transactional
-    public void requestBook(int bookId, String username) {
-        Book book = bookMapper.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Invalid book Id: " + bookId));
-        UserProfile userProfile = userProfileMapper.findByUsername(username);
-        if (userProfile != null) {
-            book.getRequestingUsers().add(userProfile);
-            bookMapper.save(book);
-
-            // Send email notification
-            SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(userProfile.getEmail());
-            message.setSubject("Book Request Submitted");
-            message.setText("You have successfully requested the book: " + book.getTitle());
-            asyncEmailService.sendEmail(message);
-        }
-    }
-
-
 
     @Override
-    @Transactional
-    public List<UserProfile> retrieveRequestingUsers(int bookId) {
-        Book book = bookMapper.findById(bookId).orElse(null);
-        if (book != null) {
-            return book.getRequestingUsers().stream().toList();
-        }
-        return Collections.emptyList();
+    public List<Book> searchBooks(SearchFormData searchFormData) {
+        SearchStrategy searchStrategy = searchFormData.isExactMatch() ? exactSearchStrategy : approximateSearchStrategy;
+        return searchStrategy.search(searchFormData);
     }
 
     @Override
     @Transactional
+    public void requestBook(int bookId, String username) {
+        Book book = findBook(bookId);
+        UserProfile userProfile = requireProfile(username);
+        if (book.getUserProfile().getUsername().equals(username)) {
+            throw new IllegalArgumentException("You cannot request your own book.");
+        }
+        if (book.getRequestingUsers().contains(userProfile)) {
+            throw new IllegalArgumentException("You have already requested this book.");
+        }
+        book.getRequestingUsers().add(userProfile);
+        bookMapper.save(book);
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(userProfile.getEmail());
+        message.setSubject("Book Request Submitted");
+        message.setText("You have successfully requested the book: " + book.getTitle());
+        asyncEmailService.sendEmail(message);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Book> retrieveBookRequests(String username) {
         UserProfile userProfile = userProfileMapper.findByUsername(username);
-        if (userProfile != null) {
-
-            List<Book> requestedBooks = userProfile.getRequestedBooks();
-            for (Book book : requestedBooks) {
-            	System.out.println("mphka\n");
-
-                Hibernate.initialize(book.getBookAuthors()); // Ensure authors are loaded
-                Hibernate.initialize(book.getBookCategory()); // Ensure category is loaded
-                logger.info("Requested book: Title - {}, Summary - {}, Category - {}, Authors - {}",
-                        book.getTitle(),
-                        book.getSummary(),
-                        book.getBookCategory().getName(),
-                        book.getBookAuthors().stream().map(BookAuthor::getName).collect(Collectors.joining(", ")));
-            }
-            return requestedBooks;
+        if (userProfile == null) {
+            return Collections.emptyList();
         }
-        logger.info("No user profile found for username: {}", username);
-        return Collections.emptyList();
+        List<Book> requestedBooks = userProfile.getRequestedBooks();
+        requestedBooks.forEach(book -> Hibernate.initialize(book.getBookAuthors()));
+        return requestedBooks;
     }
-    @Transactional
+
     @Override
-    public void acceptRequest(int bookId, String username) {
-        Book book = bookMapper.findById(bookId).orElseThrow(() -> new IllegalArgumentException("Invalid book Id: " + bookId));
-        UserProfile acceptedUser = userProfileMapper.findByUsername(username);
-        if (acceptedUser != null) {
-            List<UserProfile> requestingUsers = book.getRequestingUsers();
-            for (UserProfile user : requestingUsers) {
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setTo(user.getEmail());
-                if (user.getUsername().equals(username)) {
-                    // Notify user of acceptance
-                    message.setSubject("Book Request Accepted");
-                    message.setText("Your request for the book " + book.getTitle() + " has been accepted.");
-                } else {
-                    // Notify other users of rejection
-                    message.setSubject("Book Request Rejected");
-                    message.setText("Your request for the book " + book.getTitle() + " has been rejected.");
-                }
-                asyncEmailService.sendEmail(message);
-            }
-            // Clear the requests as the book is given to the accepted user
-            book.setRequestingUsers(Collections.emptyList());
-            bookMapper.save(book);
-        }
+    @Transactional(readOnly = true)
+    public List<UserProfile> retrieveRequestingUsers(int bookId, String ownerUsername) {
+        return List.copyOf(findOwnedBook(bookId, ownerUsername).getRequestingUsers());
     }
 
+    @Override
+    @Transactional
+    public void acceptRequest(int bookId, String ownerUsername, String acceptedUsername) {
+        Book book = findOwnedBook(bookId, ownerUsername);
+        List<UserProfile> requestingUsers = book.getRequestingUsers();
+        boolean hasRequested = requestingUsers.stream()
+                .anyMatch(user -> user.getUsername().equals(acceptedUsername));
+        if (!hasRequested) {
+            throw new IllegalArgumentException("User " + acceptedUsername + " has not requested this book.");
+        }
+
+        for (UserProfile user : requestingUsers) {
+            boolean accepted = user.getUsername().equals(acceptedUsername);
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(user.getEmail());
+            message.setSubject(accepted ? "Book Request Accepted" : "Book Request Rejected");
+            message.setText("Your request for the book " + book.getTitle() + " has been "
+                    + (accepted ? "accepted." : "rejected."));
+            asyncEmailService.sendEmail(message);
+        }
+
+        // The book is given to the accepted user, so all pending requests are closed
+        requestingUsers.clear();
+        bookMapper.save(book);
+    }
+
+    private UserProfile requireProfile(String username) {
+        UserProfile userProfile = userProfileMapper.findByUsername(username);
+        if (userProfile == null) {
+            throw new IllegalArgumentException("No user found with username: " + username);
+        }
+        return userProfile;
+    }
+
+    private Book findBook(int bookId) {
+        return bookMapper.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid book Id: " + bookId));
+    }
+
+    private Book findOwnedBook(int bookId, String username) {
+        Book book = findBook(bookId);
+        if (book.getUserProfile() == null || !book.getUserProfile().getUsername().equals(username)) {
+            throw new AccessDeniedException("Book " + bookId + " does not belong to " + username);
+        }
+        return book;
+    }
 }

@@ -11,7 +11,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name="categories")
@@ -24,7 +23,7 @@ public class BookCategory {
 	@Column(name="name")
 	private String name;
 	
-	@OneToMany(mappedBy = "BookCategory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "bookCategory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Book> books;
 
 	public int getCategoryId() {

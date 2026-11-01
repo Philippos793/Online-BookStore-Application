@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Online Bookstore</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h1>Welcome Back</h1>
+        <p class="subtitle">Login to access your bookstore account</p>
+
+        <div th:if="${param.error}" class="alert alert-error">Username or password is invalid.</div>
+        <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+        <form method="POST" th:action="@{/login}">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p class="bottom-text">
+            Don’t have an account?
+            <a th:href="@{/register}">Create one</a>
+        </p>
+    </div>
+</div>
+
+</body>
+</html>

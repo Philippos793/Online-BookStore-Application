@@ -1,12 +1,12 @@
 package socialbookstore.controllers;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class AdminController {
 
-    @RequestMapping("/admin/dashboard")
+    @GetMapping("/admin/dashboard")
     public String getAdminHome(){
         return "admin/dashboard";
     }

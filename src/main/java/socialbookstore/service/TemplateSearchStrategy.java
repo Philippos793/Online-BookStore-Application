@@ -1,10 +1,6 @@
 package socialbookstore.service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import socialbookstore.domainmodel.Book;
 import socialbookstore.formsdata.SearchFormData;
@@ -12,24 +8,28 @@ import socialbookstore.mappers.BookMapper;
 
 public abstract class TemplateSearchStrategy implements SearchStrategy {
 
-    @Autowired
-    protected BookMapper bookMapper;
+    protected final BookMapper bookMapper;
+
+    protected TemplateSearchStrategy(BookMapper bookMapper) {
+        this.bookMapper = bookMapper;
+    }
 
     @Override
-    public ArrayList<Book> search(SearchFormData searchFormData, BookMapper bookMapper) {
-        List<Book> initialList = makeInitialListOfBooks(searchFormData);
-        ArrayList<Book> filteredBooks = new ArrayList<>();
-        for (Book book : initialList) {
-
-            if (checkIfAuthorsMatch(searchFormData, book)) {
-
-                filteredBooks.add(book);
-            }
-        }
-        return filteredBooks;
+    public List<Book> search(SearchFormData searchFormData) {
+        return makeInitialListOfBooks(searchFormData).stream()
+                .filter(book -> checkIfAuthorsMatch(searchFormData, book))
+                .toList();
     }
 
     protected abstract List<Book> makeInitialListOfBooks(SearchFormData searchFormData);
 
-    protected abstract boolean checkIfAuthorsMatch(SearchFormData searchFormData, Book book);
+    // An empty author filter matches every book
+    protected boolean checkIfAuthorsMatch(SearchFormData searchFormData, Book book) {
+        List<String> authors = searchFormData.getAuthors();
+        if (authors == null || authors.isEmpty()) {
+            return true;
+        }
+        return book.getBookAuthors().stream()
+                .anyMatch(author -> authors.contains(author.getName()));
+    }
 }

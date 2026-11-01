@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import socialbookstore.domainmodel.BookAuthor;
 
-public interface BookAuthorMapper extends JpaRepository<BookAuthor, Long> {
+public interface BookAuthorMapper extends JpaRepository<BookAuthor, Integer> {
     List<BookAuthor> findByName(String name);
-    List<BookAuthor> findAll();
 }

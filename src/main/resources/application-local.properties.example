@@ -1,0 +1,6 @@
+# Copy to application-local.properties (gitignored) and fill in your own values.
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+
+spring.mail.username=YOUR_EMAIL
+spring.mail.password=YOUR_APP_PASSWORD

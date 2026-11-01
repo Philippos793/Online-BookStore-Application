@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import socialbookstore.domainmodel.Book;
 
 public interface BookMapper extends JpaRepository<Book, Integer> {
-	public List<Book> findByTitle(String title);
-	public List<Book> findByTitleContaining(String title);
+	List<Book> findByTitle(String title);
+	List<Book> findByTitleContaining(String title);
 }

@@ -1,41 +1,32 @@
 package socialbookstore.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.io.IOException;
 
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.web.DefaultRedirectStrategy;
-import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import socialbookstore.domainmodel.Role;
+
 /*
- * Determines the url that is appropriate for the logged user based on his role
+ * Determines the url that is appropriate for the logged user based on their role
  */
-@Configuration
+@Component
 public class CustomSecuritySuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-	 @Override
-	    protected void handle(
-	    		HttpServletRequest request, 
-	    		HttpServletResponse response, 
-	    		Authentication authentication)
-	    throws java.io.IOException {
-	        String targetUrl = determineTargetUrl(authentication);
-	        if(response.isCommitted()) return;
-	        RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
-	        redirectStrategy.sendRedirect(request, response, targetUrl);
-	    }
+	@Override
+	protected void handle(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+			throws IOException {
+		if (response.isCommitted()) return;
+		getRedirectStrategy().sendRedirect(request, response, determineTargetUrl(authentication));
+	}
 
-	    protected String determineTargetUrl(Authentication authentication){
-	        
-	     
-	        
-	        return "/user/dashboard";
-	    }
+	protected String determineTargetUrl(Authentication authentication) {
+		boolean isAdmin = authentication.getAuthorities().stream()
+				.anyMatch(a -> a.getAuthority().equals(Role.ADMIN.name()));
+		return isAdmin ? "/admin/dashboard" : "/user/dashboard";
+	}
 }

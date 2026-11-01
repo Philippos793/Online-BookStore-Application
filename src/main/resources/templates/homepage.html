@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <!-- Required meta tags -->
@@ -43,7 +43,7 @@
             <div class="col-12 text-center">
                 <div sec:authorize="hasRole('ROLE_ANONYMOUS')">
                     <div class="btn-group btn-group-lg" role="group" aria-label="Anonymous Actions">
-                        <a th:href="@{/signin}" class="btn btn-primary">Login</a>
+                        <a th:href="@{/login}" class="btn btn-primary">Login</a>
                         <a th:href="@{/register}" class="btn btn-secondary">Register</a>
                     </div>
                 </div>

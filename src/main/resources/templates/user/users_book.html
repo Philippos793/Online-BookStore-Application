@@ -29,6 +29,8 @@
     </nav>
     <div class="table-container">
         <h1 class="text-center mb-4">My Books</h1>
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
         <div th:if="${#lists.isEmpty(books)}" class="alert alert-info text-center">
             <p>You have not added any books yet.</p>
         </div>

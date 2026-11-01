@@ -55,16 +55,23 @@ Run the initialization scripts:
 
 ### 3. Configure database credentials
 
-Open:
+Credentials are never committed. Copy the example file and fill in your own values:
 
-`src/main/resources/application.properties`
-
-and update the following fields with your local MySQL credentials:
+```bash
+cp src/main/resources/application-local.properties.example src/main/resources/application-local.properties
+```
 
 ```properties
-spring.datasource.username=YOUR_USERNAME
-spring.datasource.password=YOUR_PASSWORD
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+
+# optional - only needed for the email notifications
+spring.mail.username=YOUR_EMAIL
+spring.mail.password=YOUR_APP_PASSWORD
 ```
+
+`application-local.properties` is gitignored. Alternatively, set the environment variables
+`DB_USERNAME`, `DB_PASSWORD`, `MAIL_USERNAME` and `MAIL_PASSWORD`.
 
 ### 4. Run the application
 
@@ -73,6 +80,14 @@ For Windows:
 ```bat
 mvnw.cmd spring-boot:run
 ```
+
+For Linux / macOS:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Run the tests with `mvnw.cmd test` (or `./mvnw test`).
 
 ### 5. Open in browser
 
@@ -99,3 +114,8 @@ and data access logic to improve maintainability and code organization.
 
 This project was developed as part of academic coursework,
 applying real-world software engineering principles and full-stack development practices.
+
+## Project Documents
+
+The original coursework documents (requirements, guidelines, sprint report, package diagram)
+are in [`docs/`](docs/).

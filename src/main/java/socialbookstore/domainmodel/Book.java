@@ -1,7 +1,6 @@
 package socialbookstore.domainmodel;
 
 import java.util.List;
-import java.util.Optional;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -15,7 +14,6 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.JoinColumn;
-import jdk.jfr.Category;
 @Entity
 @Table(name="books")
 public class Book {
@@ -48,7 +46,7 @@ public class Book {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="category_id")
 
-	private BookCategory BookCategory;
+	private BookCategory bookCategory;
 
 	@ManyToMany
 	@JoinTable(
@@ -100,11 +98,11 @@ public class Book {
 	}
 
 	public BookCategory getBookCategory() {
-		return BookCategory;
+		return bookCategory;
 	}
 
 	public void setBookCategory(BookCategory bookCategory) {
-		BookCategory = bookCategory;
+		this.bookCategory = bookCategory;
 	}
 
 	public List<UserProfile> getRequestingUsers() {
