@@ -13,6 +13,7 @@ and interact with other users through a clean and structured interface.
 - Book search functionality
 - HTML-based user interface
 - MySQL database integration
+- One-command setup with Docker Compose
 
 ## Application Preview
 
@@ -34,24 +35,41 @@ Users can browse available books, manage offers, and interact with other users.
 
 ## ⚙️ How to Run
 
+### 🐳 Option A: Docker (recommended)
+
+The only requirement is [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+git clone https://github.com/Philippos793/Online-BookStore-Application.git
+cd Online-BookStore-Application
+docker compose up --build
+```
+
+Open **http://localhost:8080** once the log shows `Started SocialbookstoreApplication`.
+
+This starts two containers: a MySQL 8 database and the application. Tables are created
+automatically and seeded with sample authors and categories; data is kept in a Docker volume.
+
+```bash
+docker compose down      # stop
+docker compose down -v   # stop and delete the database
+```
+
+### 💻 Option B: Run locally
+
+Requirements: Java 17+ and a running MySQL 8 server.
+
 ### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Philippos793/Online-BookStore-Application.git
 ```
 
-### 2. Create the MySQL database
+### 2. Database
 
-Before running the application, create the required database:
-
-```sql
-CREATE DATABASE IF NOT EXISTS secure_users_directory;
-```
-
-Run the initialization scripts:
-
-`database/init.sql`
-`database/data.sql`
+Nothing to run by hand: the `secure_users_directory` database and its tables are created on
+first startup, and sample authors and categories are inserted from
+`src/main/resources/data.sql`.
 
 ### 3. Configure database credentials
 
@@ -101,6 +119,7 @@ http://localhost:8080
 - Spring Boot
 - Spring Security
 - MySQL
+- Docker / Docker Compose
 - HTML
 - Git / GitHub
 

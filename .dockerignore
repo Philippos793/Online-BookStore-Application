@@ -1,0 +1,12 @@
+# Never bake local credentials into the image
+**/application-local.properties
+.env
+
+target/
+.git/
+.mvn/
+.vscode/
+.idea/
+docs/
+Screenshots/
+*.md
