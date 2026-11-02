@@ -31,7 +31,15 @@ public class UserController {
 
     @GetMapping("/dashboard")
     public String getUserDashboard(Model model, Authentication authentication) {
-        model.addAttribute("books", userProfileService.retrieveBookOffers(authentication.getName()));
+        String username = authentication.getName();
+        List<Book> books = userProfileService.retrieveBookOffers(username);
+        int pendingRequests = books.stream().mapToInt(book -> book.getRequestingUsers().size()).sum();
+
+        model.addAttribute("profile", userProfileService.retrieveProfile(username));
+        model.addAttribute("books", books);
+        model.addAttribute("pendingRequests", pendingRequests);
+        model.addAttribute("myRequestCount", userProfileService.retrieveBookRequests(username).size());
+        model.addAttribute("communityBooks", userProfileService.retrieveRecentBooksOfOthers(username));
         return "user/dashboard";
     }
 
@@ -92,16 +100,20 @@ public class UserController {
         return "redirect:/user/myBooks";
     }
 
+    // Without a search, the page shows the most recently added books
     @GetMapping("/searchBooks")
     public String showSearchBooksForm(Model model) {
         model.addAttribute("searchData", new SearchFormData());
+        model.addAttribute("books", userProfileService.retrieveRecentBooks());
+        model.addAttribute("searched", false);
         return "user/search_books";
     }
 
     @PostMapping("/searchBooks")
     public String searchBooks(@ModelAttribute("searchData") SearchFormData searchFormData, Model model) {
         model.addAttribute("books", userProfileService.searchBooks(searchFormData));
-        return "user/search_results";
+        model.addAttribute("searched", true);
+        return "user/search_books";
     }
 
     @PostMapping("/requestBook")
@@ -120,6 +132,7 @@ public class UserController {
     @GetMapping("/bookRequests")
     public String showUserBookRequests(Model model, Authentication authentication) {
         model.addAttribute("bookRequests", userProfileService.retrieveBookRequests(authentication.getName()));
+        model.addAttribute("suggestedBooks", userProfileService.retrieveRecentBooksOfOthers(authentication.getName()));
         return "user/book_requests";
     }
 
@@ -127,6 +140,7 @@ public class UserController {
     public String showRequestingUsersForBookOffer(@RequestParam("bookId") int bookId,
                                                   Model model,
                                                   Authentication authentication) {
+        model.addAttribute("book", userProfileService.retrieveOwnedBook(bookId, authentication.getName()));
         model.addAttribute("requestingUsers",
                 userProfileService.retrieveRequestingUsers(bookId, authentication.getName()));
         model.addAttribute("bookId", bookId);

@@ -1,42 +1,72 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login | Online Bookstore</title>
-    <link rel="stylesheet" th:href="@{/css/auth.css}">
+<head th:replace="~{fragments/layout :: head(~{::title})}">
+    <title>Login | SocialBookstore</title>
 </head>
 <body>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <h1>Welcome Back</h1>
-        <p class="subtitle">Login to access your bookstore account</p>
+<div class="auth-page">
+    <aside class="auth-aside">
+        <a class="auth-brand" th:href="@{/}"><i class="bi bi-book-half me-2"></i>SocialBookstore</a>
 
-        <div th:if="${param.error}" class="alert alert-error">Username or password is invalid.</div>
-        <div th:if="${param.logout}" class="alert alert-success">You have been logged out.</div>
-        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div>
+            <h2>Welcome back to your reading community.</h2>
+            <p class="lead mb-4">Pick up where you left off - your shelf and requests are waiting.</p>
+            <div class="auth-perk"><i class="bi bi-bookshelf"></i> Manage the books you offer</div>
+            <div class="auth-perk"><i class="bi bi-search-heart"></i> Discover books from other readers</div>
+            <div class="auth-perk"><i class="bi bi-envelope-check"></i> Get notified when a request is accepted</div>
+        </div>
 
-        <form method="POST" th:action="@{/login}">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+        <div class="auth-quote">
+            <i class="bi bi-quote fs-4"></i>
+            <p class="mb-1">A reader lives a thousand lives before he dies. The man who never reads lives only one.</p>
+            <small class="opacity-75">- George R.R. Martin</small>
+        </div>
+    </aside>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <h1>Sign in</h1>
+            <p class="subtitle">Login to access your bookstore account.</p>
+
+            <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center gap-2 border-0">
+                <i class="bi bi-exclamation-triangle-fill"></i> Username or password is invalid.
+            </div>
+            <div th:if="${param.logout}" class="alert alert-success d-flex align-items-center gap-2 border-0">
+                <i class="bi bi-check-circle-fill"></i> You have been logged out.
+            </div>
+            <div th:if="${successMessage}" class="alert alert-success d-flex align-items-center gap-2 border-0">
+                <i class="bi bi-check-circle-fill"></i> <span th:text="${successMessage}"></span>
             </div>
 
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
-            </div>
+            <form method="POST" th:action="@{/login}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required autofocus>
+                    </div>
+                </div>
 
-            <button type="submit">Login</button>
-        </form>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
 
-        <p class="bottom-text">
-            Don’t have an account?
-            <a th:href="@{/register}">Create one</a>
-        </p>
-    </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
+            </form>
+
+            <p class="text-center text-body-secondary mt-4 mb-0">
+                Don’t have an account?
+                <a th:href="@{/register}" class="fw-semibold">Create one</a>
+            </p>
+        </div>
+    </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

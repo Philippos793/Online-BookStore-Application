@@ -22,9 +22,14 @@ public interface UserProfileService {
 	void deleteBookOffer(String username, int bookId);
 
 	List<Book> searchBooks(SearchFormData searchFormData);
+	List<Book> retrieveRecentBooks();
+	List<Book> retrieveRecentBooksOfOthers(String username);
+	long countBooks();
+	long countMembers();
 
 	void requestBook(int bookId, String username);
 	List<Book> retrieveBookRequests(String username);
+	Book retrieveOwnedBook(int bookId, String ownerUsername);
 	List<UserProfile> retrieveRequestingUsers(int bookId, String ownerUsername);
 	void acceptRequest(int bookId, String ownerUsername, String acceptedUsername);
 }

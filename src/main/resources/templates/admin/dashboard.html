@@ -1,37 +1,73 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-
-	<title>Admin Dashboard</title>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(~{::title})}">
+    <title>Admin | SocialBookstore</title>
 </head>
-
-
 <body>
+<nav th:replace="~{fragments/layout :: navbar('admin')}"></nav>
 
-<div class="container">
+<main>
+    <header class="page-header">
+        <div class="container">
+            <h1><i class="bi bi-shield-lock me-2"></i>Admin dashboard</h1>
+            <p>An overview of the SocialBookstore community.</p>
+        </div>
+    </header>
 
-  <h2>Welcome to Admin Dashboard</h2>
-  
-  <br> <br> <hr> <br> <br>
-  
-  <h4>Logged as: <span sec:authentication="name"></span></h4>
-  <h4>Has role: <span sec:authentication="authorities"></span></h4>
+    <div class="container">
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon blue"><i class="bi bi-people"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${memberCount}">0</div>
+                        <div class="stat-label">Members</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon green"><i class="bi bi-book"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${bookCount}">0</div>
+                        <div class="stat-label">Books offered</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon orange"><i class="bi bi-person-lines-fill"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${authorCount}">0</div>
+                        <div class="stat-label">Authors</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon purple"><i class="bi bi-tags"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${categoryCount}">0</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-	<br> <br> <hr> <br> <br>
+        <h2 class="section-title"><i class="bi bi-clock-history"></i> Latest books</h2>
+        <div th:if="${#lists.isEmpty(recentBooks)}" class="sb-card empty-state">
+            <div class="empty-icon"><i class="bi bi-book"></i></div>
+            <h5>No books yet</h5>
+            <p>Books offered by members will appear here.</p>
+        </div>
+        <div class="row g-3" th:unless="${#lists.isEmpty(recentBooks)}">
+            <div class="col-sm-6 col-lg-3" th:each="book : ${recentBooks}">
+                <div th:replace="~{fragments/layout :: bookCard(${book}, 'none')}"></div>
+            </div>
+        </div>
+    </div>
+</main>
 
-    <p>
-    	<a th:href="@{/}" class="btn btn-primary btn-sm mb-3">Home</a>
-    	<a th:href="@{/logout}" class="btn btn-danger btn-sm mb-3">Logout</a>
-    
-    </p>
-
-</div>
-
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

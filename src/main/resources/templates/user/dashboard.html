@@ -1,69 +1,149 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <title>User Dashboard</title>
-    <style>
-        body {
-            padding-top: 50px;
-        }
-        .header, .footer {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .btn-group-lg > .btn {
-            margin-right: 10px;
-        }
-    </style>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(~{::title})}">
+    <title>Dashboard | SocialBookstore</title>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h2>Welcome to User Dashboard</h2>
-        <div class="btn-group btn-group-lg" role="group" aria-label="User Actions">
-            <a th:href="@{/user/addBookOffer}" class="btn btn-success">Add Book Offer</a>
-            <a th:href="@{/user/myBooks}" class="btn btn-success">My Book List</a>
-            <a th:href="@{/user/searchBooks}" class="btn btn-primary">Search Books</a>
+<nav th:replace="~{fragments/layout :: navbar('dashboard')}"></nav>
+
+<main>
+    <header class="page-header">
+        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+                <h1>
+                    Welcome back,
+                    <span th:text="${profile != null and !#strings.isEmpty(profile.fullName) ? profile.fullName : #authentication.name}">reader</span> 👋
+                </h1>
+                <p>Here is what is happening with your books today.</p>
+            </div>
+            <a th:href="@{/user/addBookOffer}" class="btn btn-light px-4">
+                <i class="bi bi-plus-lg me-1"></i> Offer a book
+            </a>
         </div>
+    </header>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <!-- Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon blue"><i class="bi bi-bookshelf"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${#lists.size(books)}">0</div>
+                        <div class="stat-label">My book offers</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon orange"><i class="bi bi-inbox"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${pendingRequests}">0</div>
+                        <div class="stat-label">Requests for my books</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon green"><i class="bi bi-send"></i></div>
+                    <div>
+                        <div class="stat-value" th:text="${myRequestCount}">0</div>
+                        <div class="stat-label">Books I requested</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="sb-card stat-card h-100">
+                    <div class="stat-icon purple"><i class="bi bi-heart"></i></div>
+                    <div>
+                        <div class="stat-value"
+                             th:text="${profile != null and profile.favouriteBookCategories != null ? #lists.size(profile.favouriteBookCategories) : 0}">0</div>
+                        <div class="stat-label">Favourite categories</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- My offers -->
+            <div class="col-lg-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="section-title mb-0"><i class="bi bi-bookshelf"></i> My book offers</h2>
+                    <a th:href="@{/user/myBooks}" class="small fw-semibold" th:unless="${#lists.isEmpty(books)}">
+                        Manage all <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                <div th:if="${#lists.isEmpty(books)}" class="sb-card empty-state">
+                    <div class="empty-icon"><i class="bi bi-journal-plus"></i></div>
+                    <h5>You haven't offered any books yet</h5>
+                    <p>Share a book you have already read and let other readers request it.</p>
+                    <a th:href="@{/user/addBookOffer}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i> Offer your first book</a>
+                </div>
+
+                <div class="row g-3" th:unless="${#lists.isEmpty(books)}">
+                    <div class="col-sm-6" th:each="book, stat : ${books}" th:if="${stat.index < 4}">
+                        <div th:replace="~{fragments/layout :: bookCard(${book}, 'requests')}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="sb-card sb-card-body mb-4">
+                    <h2 class="section-title"><i class="bi bi-lightning-charge"></i> Quick actions</h2>
+                    <div class="d-grid gap-2">
+                        <a th:href="@{/user/addBookOffer}" class="btn btn-outline-primary text-start"><i class="bi bi-plus-square me-2"></i> Offer a new book</a>
+                        <a th:href="@{/user/searchBooks}" class="btn btn-outline-primary text-start"><i class="bi bi-search me-2"></i> Search for books</a>
+                        <a th:href="@{/user/bookRequests}" class="btn btn-outline-primary text-start"><i class="bi bi-send me-2"></i> Books I requested</a>
+                    </div>
+                </div>
+
+                <div class="sb-card sb-card-body" th:if="${profile != null}">
+                    <h2 class="section-title"><i class="bi bi-person"></i> My profile</h2>
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span class="avatar avatar-lg" th:text="${#strings.substring(#authentication.name, 0, 1)}">U</span>
+                        <div>
+                            <div class="fw-semibold" th:text="${profile.fullName}">Full name</div>
+                            <div class="small text-body-secondary" th:text="${profile.email}">email</div>
+                        </div>
+                    </div>
+                    <div class="small text-body-secondary mb-2">Favourite categories</div>
+                    <div class="d-flex flex-wrap gap-1 mb-3">
+                        <span class="chip" th:each="category : ${profile.favouriteBookCategories}" th:text="${category.name}">Category</span>
+                        <span class="small text-body-secondary" th:if="${#lists.isEmpty(profile.favouriteBookCategories)}">None selected</span>
+                    </div>
+                    <div class="small text-body-secondary mb-2">Favourite authors</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        <span class="chip chip-success" th:each="author : ${profile.favouriteBookAuthors}" th:text="${author.name}">Author</span>
+                        <span class="small text-body-secondary" th:if="${#lists.isEmpty(profile.favouriteBookAuthors)}">None selected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community -->
+        <section class="mt-5">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title mb-0"><i class="bi bi-people"></i> New from the community</h2>
+                <a th:href="@{/user/searchBooks}" class="small fw-semibold">Browse all <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div th:if="${#lists.isEmpty(communityBooks)}" class="sb-card empty-state">
+                <div class="empty-icon"><i class="bi bi-people"></i></div>
+                <h5>Nothing here yet</h5>
+                <p>When other readers offer books, the newest ones will show up here.</p>
+            </div>
+            <div class="row g-3" th:unless="${#lists.isEmpty(communityBooks)}">
+                <div class="col-sm-6 col-lg-3" th:each="book, stat : ${communityBooks}" th:if="${stat.index < 4}">
+                    <div th:replace="~{fragments/layout :: bookCard(${book}, 'request')}"></div>
+                </div>
+            </div>
+        </section>
     </div>
-    <h4>My Book Offers</h4>
-    <div th:if="${#lists.isEmpty(books)}">
-        <p>You have not made any book offers yet.</p>
-    </div>
-    <div th:if="${!#lists.isEmpty(books)}">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Summary</th>
-                    <th>Category</th>
-                    <th>Authors</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="book : ${books}">
-                    <td th:text="${book.title}"></td>
-                    <td th:text="${book.summary}"></td>
-                    <td th:text="${book.bookCategory.name}"></td>
-                    <td>
-                        <span th:each="author, stat : ${book.bookAuthors}">
-                            <span th:text="${author.name}"></span><span th:if="${!stat.last}">, </span>
-                        </span>
-                    </td>
-                    <td>
-                        <a th:href="@{/user/requestingUsers(bookId=${book.bookId})}" class="btn btn-primary btn-sm">View Requests</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="footer">
-        <a th:href="@{/}" class="btn btn-primary btn-sm mb-3">Home</a>
-        <a th:href="@{/logout}" class="btn btn-danger btn-sm mb-3">Logout</a>
-    </div>
-</div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

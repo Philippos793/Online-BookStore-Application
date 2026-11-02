@@ -1,71 +1,109 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Book Offer</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-    <style>
-        body {
-            padding-top: 50px;
-        }
-        .form-container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-    </style>
+<head th:replace="~{fragments/layout :: head(~{::title})}">
+    <title>Offer a Book | SocialBookstore</title>
 </head>
 <body>
-<div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <a class="navbar-brand" th:href="@{/user/dashboard}">SocialBookstore</a>
-    </nav>
-    <div class="form-container">
-        <h2 class="text-center mb-4">Add Book Offer</h2>
-        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-        <form th:action="@{/user/addBook}" method="post">
-            <div class="form-group">
-                <label for="title">Book Title:</label>
-                <input type="text" class="form-control" id="title" name="title" required>
-            </div>
-            <div class="form-group">
-                <label for="authorNames">Author(s):</label>
-                <div id="authorFields">
-                    <input type="text" class="form-control mb-2" name="authorNames" placeholder="Enter author name" required>
+<nav th:replace="~{fragments/layout :: navbar('addBook')}"></nav>
+
+<main>
+    <header class="page-header">
+        <div class="container">
+            <h1>Offer a book</h1>
+            <p>Share a book you have already read with other readers.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="sb-card sb-card-body p-lg-4">
+                    <form th:action="@{/user/addBook}" method="post">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Book title</label>
+                            <input type="text" class="form-control" id="title" name="title" placeholder="e.g. Pride and Prejudice" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Author(s)</label>
+                            <div id="authorFields">
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+                                    <input type="text" class="form-control" name="authorNames" list="knownAuthors"
+                                           placeholder="Start typing an author name" required>
+                                </div>
+                            </div>
+                            <datalist id="knownAuthors">
+                                <option th:each="author : ${authors}" th:value="${author.name}"></option>
+                            </datalist>
+                            <button type="button" class="btn btn-sm btn-light" onclick="addAuthorField()">
+                                <i class="bi bi-plus-lg me-1"></i> Add another author
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" name="categoryId" required>
+                                <option value="">Select a category</option>
+                                <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.name}"></option>
+                            </select>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="summary" class="form-label">Summary</label>
+                            <textarea class="form-control" id="summary" name="summary" rows="4"
+                                      placeholder="What is the book about? Is it in good condition?" required></textarea>
+                        </div>
+
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a th:href="@{/user/dashboard}" class="btn btn-light px-4">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-4"><i class="bi bi-check-lg me-1"></i> Publish offer</button>
+                        </div>
+                    </form>
                 </div>
-                <button type="button" class="btn btn-secondary" onclick="addAuthorField()">Add another author</button>
             </div>
-            <div class="form-group">
-                <label for="category">Category:</label>
-                <select class="form-control" id="category" name="categoryId" required>
-                    <option value="">Select a Category</option>
-                    <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.name}"></option>
-                </select>
+
+            <div class="col-lg-4">
+                <div class="sb-card sb-card-body">
+                    <h2 class="section-title"><i class="bi bi-lightbulb"></i> Tips for a great offer</h2>
+                    <div class="tip">
+                        <i class="bi bi-type"></i>
+                        <p>Use the <strong>full title</strong> so readers can find it with an exact search.</p>
+                    </div>
+                    <div class="tip">
+                        <i class="bi bi-people"></i>
+                        <p>Pick an existing author from the suggestions to avoid duplicates.</p>
+                    </div>
+                    <div class="tip">
+                        <i class="bi bi-chat-square-text"></i>
+                        <p>Mention the <strong>condition</strong> of the book in the summary.</p>
+                    </div>
+                    <div class="tip">
+                        <i class="bi bi-envelope"></i>
+                        <p>You will see every request on your dashboard and decide who gets it.</p>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="summary">Summary:</label>
-                <textarea class="form-control" id="summary" name="summary" rows="3" required></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Submit</button>
-        </form>
+        </div>
     </div>
-</div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
 <script>
     function addAuthorField() {
-        const div = document.createElement('div');
-        div.className = 'form-group';
-        div.innerHTML = '<input type="text" class="form-control mb-2" name="authorNames" placeholder="Enter author name" required>';
-        document.getElementById('authorFields').appendChild(div);
+        const group = document.createElement('div');
+        group.className = 'input-group mb-2';
+        group.innerHTML =
+            '<span class="input-group-text bg-white"><i class="bi bi-person"></i></span>' +
+            '<input type="text" class="form-control" name="authorNames" list="knownAuthors" placeholder="Author name">' +
+            '<button type="button" class="btn btn-outline-danger" title="Remove"><i class="bi bi-x-lg"></i></button>';
+        group.querySelector('button').addEventListener('click', () => group.remove());
+        document.getElementById('authorFields').appendChild(group);
+        group.querySelector('input').focus();
     }
 </script>
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

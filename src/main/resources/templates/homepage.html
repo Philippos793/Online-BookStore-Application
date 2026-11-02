@@ -1,83 +1,133 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-
-    <title>Homepage</title>
-
-    <style>
-        body {
-            padding-top: 50px;
-        }
-
-        .welcome-message {
-            text-align: center;
-            margin-bottom: 50px;
-        }
-
-        .role-info {
-            margin-bottom: 30px;
-        }
-
-        .btn-group {
-            margin-bottom: 30px;
-        }
-    </style>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{fragments/layout :: head(~{::title})}">
+    <title>SocialBookstore - Share the books you love</title>
 </head>
-
 <body>
-    <div class="container">
-        <div class="row">
-            <div class="col-12 welcome-message">
-                <h2 class="display-4">Welcome to Homepage</h2>
-            </div>
-        </div>
+<nav th:replace="~{fragments/layout :: navbar('home')}"></nav>
 
-        <div class="row">
-            <div class="col-12 text-center">
-                <div sec:authorize="hasRole('ROLE_ANONYMOUS')">
-                    <div class="btn-group btn-group-lg" role="group" aria-label="Anonymous Actions">
-                        <a th:href="@{/login}" class="btn btn-primary">Login</a>
-                        <a th:href="@{/register}" class="btn btn-secondary">Register</a>
+<main>
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="badge rounded-pill text-bg-light text-primary mb-3 px-3 py-2">
+                        <i class="bi bi-stars me-1"></i> A community of readers
+                    </span>
+                    <h1 class="mb-3">Give your books a second life.</h1>
+                    <p class="lead mb-4">
+                        Offer the books you have already read, discover what other readers share
+                        and request the ones you want next - all in one place.
+                    </p>
+                    <div class="d-flex flex-wrap gap-2" sec:authorize="!isAuthenticated()">
+                        <a th:href="@{/register}" class="btn btn-light btn-lg px-4">Get started - it's free</a>
+                        <a th:href="@{/login}" class="btn btn-outline-light btn-lg px-4">Login</a>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2" sec:authorize="hasAuthority('USER')">
+                        <a th:href="@{/user/dashboard}" class="btn btn-light btn-lg px-4">Go to dashboard</a>
+                        <a th:href="@{/user/searchBooks}" class="btn btn-outline-light btn-lg px-4">Browse books</a>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2" sec:authorize="hasAuthority('ADMIN')">
+                        <a th:href="@{/admin/dashboard}" class="btn btn-light btn-lg px-4">Admin dashboard</a>
+                    </div>
+
+                    <div class="d-flex gap-4 mt-5">
+                        <div>
+                            <div class="fs-3 fw-bold" th:text="${bookCount}">0</div>
+                            <div class="small opacity-75">books shared</div>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold" th:text="${memberCount}">0</div>
+                            <div class="small opacity-75">readers</div>
+                        </div>
+                        <div>
+                            <div class="fs-3 fw-bold" th:text="${categoryCount}">0</div>
+                            <div class="small opacity-75">categories</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block">
+                    <div class="hero-books">
+                        <div class="book-cover cover-1">
+                            <i class="bi bi-book cover-icon"></i>
+                            <div class="cover-title">The Great Adventure</div>
+                        </div>
+                        <div class="book-cover cover-2">
+                            <i class="bi bi-book cover-icon"></i>
+                            <div class="cover-title">Stories of Tomorrow</div>
+                        </div>
+                        <div class="book-cover cover-3">
+                            <i class="bi bi-book cover-icon"></i>
+                            <div class="cover-title">A Quiet Mystery</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="row" sec:authorize="isAuthenticated()">
-            <div class="col-12 text-center">
-                <div class="role-info">
-                    <h4>Logged in as: <span sec:authentication="name"></span></h4>
-                    <h4>Role: <span sec:authentication="authorities"></span></h4>
+    <!-- How it works -->
+    <section class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How it works</h2>
+            <p class="text-body-secondary">Three simple steps to start sharing.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="sb-card sb-card-body h-100">
+                    <div class="feature-icon"><i class="bi bi-plus-square"></i></div>
+                    <div class="step-number">Step 1</div>
+                    <h5 class="fw-bold mt-1">Offer a book</h5>
+                    <p class="text-body-secondary mb-0">Add the books you have finished, with authors, a category and a short summary.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sb-card sb-card-body h-100">
+                    <div class="feature-icon"><i class="bi bi-search-heart"></i></div>
+                    <div class="step-number">Step 2</div>
+                    <h5 class="fw-bold mt-1">Find your next read</h5>
+                    <p class="text-body-secondary mb-0">Search by title and author, with exact or approximate matching, and request what you like.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="sb-card sb-card-body h-100">
+                    <div class="feature-icon"><i class="bi bi-envelope-check"></i></div>
+                    <div class="step-number">Step 3</div>
+                    <h5 class="fw-bold mt-1">Get notified</h5>
+                    <p class="text-body-secondary mb-0">Owners choose who gets the book and every requester is notified by email.</p>
                 </div>
             </div>
         </div>
+    </section>
 
-        <div class="row" sec:authorize="isAuthenticated()">
-            <div class="col-12 text-center">
-                <div sec:authorize="hasAuthority('USER')" class="btn-group btn-group-lg" role="group" aria-label="User Actions">
-                    <a th:href="@{/user/dashboard}" class="btn btn-primary">User Dashboard</a>
-                    <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
-                </div>
-                <div sec:authorize="hasAuthority('ADMIN')" class="btn-group btn-group-lg" role="group" aria-label="Admin Actions">
-                    <a th:href="@{/admin/dashboard}" class="btn btn-primary">Admin Dashboard</a>
-                    <a th:href="@{/logout}" class="btn btn-danger">Logout</a>
-                </div>
+    <!-- Recently added -->
+    <section class="container pb-4">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <div>
+                <h2 class="fw-bold mb-1">Recently added</h2>
+                <p class="text-body-secondary mb-0">The latest books shared by the community.</p>
+            </div>
+            <a sec:authorize="hasAuthority('USER')" th:href="@{/user/searchBooks}" class="btn btn-outline-primary btn-sm">
+                Browse all <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(recentBooks)}" class="sb-card empty-state">
+            <div class="empty-icon"><i class="bi bi-book"></i></div>
+            <h5>No books yet</h5>
+            <p>Be the first to share a book with the community.</p>
+            <a th:href="@{/register}" class="btn btn-primary" sec:authorize="!isAuthenticated()">Create an account</a>
+        </div>
+
+        <div class="row g-4" th:unless="${#lists.isEmpty(recentBooks)}">
+            <div class="col-sm-6 col-lg-3" th:each="book : ${recentBooks}">
+                <div th:replace="~{fragments/layout :: bookCard(${book}, 'none')}"></div>
             </div>
         </div>
-    </div>
+    </section>
+</main>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvvhxxDsw0xIM+B07jRM" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAi2Fvo5Lc/fPXYF+hEtnyZHnSNE9twXds6LkM39KM3c41mweSwq0MRxaErzs4R" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+6aFw5t1K6LZZ0iO+M86deH9wfyjLrDg2uC29mg2ftW8anD3GP+uaaw9T" crossorigin="anonymous"></script>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
-
 </html>

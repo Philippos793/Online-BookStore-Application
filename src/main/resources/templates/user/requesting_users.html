@@ -1,44 +1,68 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Requesting Users</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(~{::title})}">
+    <title>Requests | SocialBookstore</title>
 </head>
 <body>
-<div class="container">
-    <h2>Users Requesting Your Book</h2>
-    <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
-    <div th:if="${#lists.isEmpty(requestingUsers)}">
-        <p>No users found.</p>
+<nav th:replace="~{fragments/layout :: navbar('myBooks')}"></nav>
+
+<main>
+    <header class="page-header">
+        <div class="container">
+            <a th:href="@{/user/myBooks}" class="text-white text-decoration-none small opacity-75">
+                <i class="bi bi-arrow-left me-1"></i> Back to my books
+            </a>
+            <h1 class="mt-2">Requests for "<span th:text="${book.title}">Title</span>"</h1>
+            <p>Choose who gets the book. Everyone who asked will be notified by email.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 order-lg-2">
+                <div th:replace="~{fragments/layout :: bookCard(${book}, 'none')}"></div>
+            </div>
+
+            <div class="col-lg-8 order-lg-1">
+                <div th:if="${#lists.isEmpty(requestingUsers)}" class="sb-card empty-state">
+                    <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                    <h5>No requests right now</h5>
+                    <p>Nobody has requested this book yet, or you have already accepted a request.</p>
+                    <a th:href="@{/user/myBooks}" class="btn btn-outline-primary">Back to my books</a>
+                </div>
+
+                <div class="sb-card" th:unless="${#lists.isEmpty(requestingUsers)}">
+                    <div class="sb-card-body pb-0">
+                        <h2 class="section-title">
+                            <i class="bi bi-people"></i>
+                            <span th:text="${#lists.size(requestingUsers)}">0</span> readers want this book
+                        </h2>
+                    </div>
+                    <div class="person-row" th:each="user : ${requestingUsers}">
+                        <span class="avatar avatar-lg" th:text="${#strings.substring(user.username, 0, 1)}">U</span>
+                        <div class="person-info">
+                            <div class="name" th:text="${#strings.isEmpty(user.fullName) ? user.username : user.fullName}">Full name</div>
+                            <div class="meta">
+                                <i class="bi bi-at"></i><span th:text="${user.username}">username</span>
+                                <span class="mx-1">·</span>
+                                <i class="bi bi-envelope me-1"></i><span th:text="${user.email}">email</span>
+                            </div>
+                        </div>
+                        <form th:action="@{/user/acceptRequest}" method="post"
+                              onsubmit="return confirm('Give the book to this reader? All other requests will be rejected.');">
+                            <input type="hidden" name="bookId" th:value="${bookId}">
+                            <input type="hidden" name="username" th:value="${user.username}">
+                            <button type="submit" class="btn btn-primary btn-sm px-3"><i class="bi bi-check-lg me-1"></i> Accept</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div th:if="${!#lists.isEmpty(requestingUsers)}">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Username</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="user : ${requestingUsers}">
-                <td th:text="${user.username}"></td>
-                <td th:text="${user.fullName}"></td>
-                <td th:text="${user.email}"></td>
-                <td>
-                    <form th:action="@{/user/acceptRequest}" method="post">
-                        <input type="hidden" name="bookId" th:value="${bookId}" />
-                        <input type="hidden" name="username" th:value="${user.username}" />
-                        <button type="submit" class="btn btn-success">Accept</button>
-                    </form>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>

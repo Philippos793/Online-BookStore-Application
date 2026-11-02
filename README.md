@@ -1,41 +1,14 @@
-# Online Bookstore Web Application
+# 📚 SocialBookstore
 
-A full-stack web application developed using **Java Spring Boot** that allows users to interact
-with a digital bookstore environment. Users can register, manage their profiles, browse books,
-and interact with other users through a clean and structured interface.
+A full-stack web application where readers **share the books they have already read**.
+Users offer books, search what the community has to offer, request the ones they want,
+and owners decide who gets each book - with email notifications for everyone involved.
 
-## Features
+Built with **Java 17, Spring Boot 3, Spring Security, Thymeleaf and MySQL**, fully containerized with **Docker**.
 
-- User registration and login
-- User authentication and authorization with Spring Security
-- Profile management
-- Book offer management
-- Book search functionality
-- HTML-based user interface
-- MySQL database integration
-- One-command setup with Docker Compose
+<img src="Screenshots/home.png" width="900" alt="Landing page">
 
-## Application Preview
-
-### 🔐 Login Page
-Users can log in using their credentials or navigate to the registration page.
-
-<img src="Screenshots/login.png" width="600">
-
-### 📝 Register Page
-New users can create an account by providing their details and selecting preferred categories.
-
-<img src="Screenshots/register.png" width="600">
-
-### 📚 Dashboard
-Users can browse available books, manage offers, and interact with other users.
-
-<img src="Screenshots/dashboard.png" width="600">
-
-
-## ⚙️ How to Run
-
-### 🐳 Option A: Docker (recommended)
+## 🚀 Quick start
 
 The only requirement is [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 
@@ -45,96 +18,114 @@ cd Online-BookStore-Application
 docker compose up --build
 ```
 
-Open **http://localhost:8080** once the log shows `Started SocialbookstoreApplication`.
+Then open **http://localhost:8080** and create an account.
 
-This starts two containers: a MySQL 8 database and the application. Tables are created
-automatically and seeded with sample authors and categories; data is kept in a Docker volume.
+That's it - Docker builds the app, starts a MySQL database, creates the tables and loads
+sample authors and categories. Nothing else to install or configure.
 
 ```bash
-docker compose down      # stop
+docker compose down      # stop (your data is kept)
 docker compose down -v   # stop and delete the database
 ```
 
-### 💻 Option B: Run locally
+## ✨ Features
+
+- **Accounts** - registration with profile, favourite categories and authors; secure login with Spring Security (BCrypt, CSRF protection, role-based access)
+- **Book offers** - add books with multiple authors, a category and a summary; manage your shelf
+- **Search** - by title and authors, with exact or approximate matching (Strategy / Template Method patterns)
+- **Requests** - request books from other readers; owners see who asked and accept one request
+- **Email notifications** - requesters are notified asynchronously when a request is submitted, accepted or rejected
+- **Dashboard** - personal stats, your offers, your profile and the newest books from the community
+- **Responsive UI** - Bootstrap 5 design that works on desktop and mobile
+
+## 🖼️ Screenshots
+
+### Dashboard
+<img src="Screenshots/dashboard.png" width="900" alt="Dashboard">
+
+### Browse & search
+<img src="Screenshots/browse.png" width="900" alt="Browse books">
+
+### Managing requests for a book
+<img src="Screenshots/requests.png" width="900" alt="Requests for a book">
+
+### Offer a book
+<img src="Screenshots/add-book.png" width="900" alt="Offer a book">
+
+### Login & registration
+<img src="Screenshots/login.png" width="900" alt="Login">
+
+<img src="Screenshots/register.png" width="900" alt="Register">
+
+## 🛠️ Tech stack
+
+| Layer | Technologies |
+|---|---|
+| Backend | Java 17, Spring Boot 3, Spring MVC, Spring Data JPA (Hibernate), Spring Security, Spring Mail |
+| Frontend | Thymeleaf, Bootstrap 5, Bootstrap Icons |
+| Database | MySQL 8 |
+| DevOps | Docker, Docker Compose (multi-stage build) |
+| Testing | JUnit 5, Mockito |
+
+## 🏗️ Architecture
+
+The application follows a layered MVC architecture:
+
+```
+controllers/   HTTP endpoints and view models
+service/       business logic, search strategies, async email
+mappers/       Spring Data JPA repositories
+domainmodel/   JPA entities (User, UserProfile, Book, BookAuthor, BookCategory)
+templates/     Thymeleaf views with shared layout fragments
+```
+
+Authorization is enforced in the service layer: only a book's owner can view, accept or delete
+the requests for it.
+
+## 📧 Email notifications (optional)
+
+Emails are sent through Gmail SMTP. To enable them, create a `.env` file next to
+`docker-compose.yml`:
+
+```properties
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
+```
+
+Without it, everything else works normally - emails are just not delivered (the failure is only logged).
+
+<details>
+<summary><b>💻 Running without Docker</b></summary>
+
+<br>
 
 Requirements: Java 17+ and a running MySQL 8 server.
 
-### 1. Clone the repository
+1. Copy the example config and fill in your MySQL credentials (this file is gitignored):
+
+   ```bash
+   cp src/main/resources/application-local.properties.example src/main/resources/application-local.properties
+   ```
+
+2. Start the application - the database and tables are created automatically:
+
+   ```bash
+   ./mvnw spring-boot:run        # Linux / macOS
+   mvnw.cmd spring-boot:run      # Windows
+   ```
+
+3. Open **http://localhost:8080**
+
+</details>
+
+## 🧪 Tests
 
 ```bash
-git clone https://github.com/Philippos793/Online-BookStore-Application.git
+./mvnw test
 ```
 
-### 2. Database
+## 📄 Project context
 
-Nothing to run by hand: the `secure_users_directory` database and its tables are created on
-first startup, and sample authors and categories are inserted from
-`src/main/resources/data.sql`.
-
-### 3. Configure database credentials
-
-Credentials are never committed. Copy the example file and fill in your own values:
-
-```bash
-cp src/main/resources/application-local.properties.example src/main/resources/application-local.properties
-```
-
-```properties
-spring.datasource.username=YOUR_DB_USERNAME
-spring.datasource.password=YOUR_DB_PASSWORD
-
-# optional - only needed for the email notifications
-spring.mail.username=YOUR_EMAIL
-spring.mail.password=YOUR_APP_PASSWORD
-```
-
-`application-local.properties` is gitignored. Alternatively, set the environment variables
-`DB_USERNAME`, `DB_PASSWORD`, `MAIL_USERNAME` and `MAIL_PASSWORD`.
-
-### 4. Run the application
-
-For Windows:
-
-```bat
-mvnw.cmd spring-boot:run
-```
-
-For Linux / macOS:
-
-```bash
-./mvnw spring-boot:run
-```
-
-Run the tests with `mvnw.cmd test` (or `./mvnw test`).
-
-### 5. Open in browser
-
-```text
-http://localhost:8080
-```
-
-## Technologies Used
-
-- Java
-- Spring Boot
-- Spring Security
-- MySQL
-- Docker / Docker Compose
-- HTML
-- Git / GitHub
-
-## Architecture
-
-The application follows an MVC-based structure, separating controllers, views, models, services,
-and data access logic to improve maintainability and code organization.
-
-
-## Project Context
-
-This project was developed as part of academic coursework,
-applying real-world software engineering principles and full-stack development practices.
-
-## Project Documents
-
-The original coursework documents (requirements, guidelines, sprint report, package diagram)
-are in [`docs/`](docs/).
+This project was developed as part of academic coursework, applying software engineering
+principles and full-stack development practices. The original coursework documents
+(requirements, guidelines, sprint report, package diagram) are in [`docs/`](docs/).

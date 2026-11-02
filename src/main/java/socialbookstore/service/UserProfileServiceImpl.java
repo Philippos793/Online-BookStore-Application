@@ -121,6 +121,26 @@ public class UserProfileServiceImpl implements UserProfileService {
     }
 
     @Override
+    public List<Book> retrieveRecentBooks() {
+        return bookMapper.findTop8ByOrderByBookIdDesc();
+    }
+
+    @Override
+    public List<Book> retrieveRecentBooksOfOthers(String username) {
+        return bookMapper.findTop6ByUserProfile_UsernameNotOrderByBookIdDesc(username);
+    }
+
+    @Override
+    public long countBooks() {
+        return bookMapper.count();
+    }
+
+    @Override
+    public long countMembers() {
+        return userProfileMapper.count();
+    }
+
+    @Override
     @Transactional
     public void requestBook(int bookId, String username) {
         Book book = findBook(bookId);
@@ -151,6 +171,12 @@ public class UserProfileServiceImpl implements UserProfileService {
         List<Book> requestedBooks = userProfile.getRequestedBooks();
         requestedBooks.forEach(book -> Hibernate.initialize(book.getBookAuthors()));
         return requestedBooks;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Book retrieveOwnedBook(int bookId, String ownerUsername) {
+        return findOwnedBook(bookId, ownerUsername);
     }
 
     @Override

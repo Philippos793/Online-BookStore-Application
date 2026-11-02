@@ -1,40 +1,66 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Book Requests</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(~{::title})}">
+    <title>My Requests | SocialBookstore</title>
 </head>
 <body>
-<div class="container">
-    <h2>Book Requests</h2>
-    <div th:if="${#lists.isEmpty(bookRequests)}">
-        <p>No book requests found.</p>
+<nav th:replace="~{fragments/layout :: navbar('requests')}"></nav>
+
+<main>
+    <header class="page-header">
+        <div class="container">
+            <h1>My Requests</h1>
+            <p>The books you have asked for. The owner will email you when they decide.</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div th:replace="~{fragments/layout :: alerts}"></div>
+
+        <div th:if="${#lists.isEmpty(bookRequests)}" class="sb-card empty-state">
+            <div class="empty-icon"><i class="bi bi-send"></i></div>
+            <h5>No requests yet</h5>
+            <p>Browse the books offered by other readers and request the ones you would like to read.</p>
+            <a th:href="@{/user/searchBooks}" class="btn btn-primary"><i class="bi bi-search me-1"></i> Browse books</a>
+        </div>
+
+        <div class="sb-card" th:unless="${#lists.isEmpty(bookRequests)}">
+            <div class="person-row" th:each="book : ${bookRequests}">
+                <div class="book-cover rounded-3 flex-shrink-0" style="width: 64px; height: 88px; padding: .5rem;"
+                     th:classappend="'cover-' + ${book.bookCategory != null ? book.bookCategory.categoryId % 6 : 0}">
+                    <i class="bi bi-book"></i>
+                </div>
+                <div class="person-info">
+                    <div class="name" th:text="${book.title}">Title</div>
+                    <div class="meta">
+                        <span th:each="author, stat : ${book.bookAuthors}" th:text="${author.name + (stat.last ? '' : ', ')}">Author</span>
+                    </div>
+                    <div class="meta mt-1" th:if="${book.userProfile != null}">
+                        <i class="bi bi-person-circle me-1"></i> offered by
+                        <strong th:text="${book.userProfile.username}">owner</strong>
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-items-end gap-2">
+                    <span class="chip" th:if="${book.bookCategory != null}" th:text="${book.bookCategory.name}">Category</span>
+                    <span class="chip chip-warning"><i class="bi bi-hourglass-split"></i> Pending</span>
+                </div>
+            </div>
+        </div>
+
+        <section class="mt-5" th:unless="${#lists.isEmpty(suggestedBooks)}">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title mb-0"><i class="bi bi-stars"></i> Discover more</h2>
+                <a th:href="@{/user/searchBooks}" class="small fw-semibold">Browse all <i class="bi bi-arrow-right"></i></a>
+            </div>
+            <div class="row g-3">
+                <div class="col-sm-6 col-lg-3" th:each="book, stat : ${suggestedBooks}" th:if="${stat.index < 4}">
+                    <div th:replace="~{fragments/layout :: bookCard(${book}, 'request')}"></div>
+                </div>
+            </div>
+        </section>
     </div>
-    <div th:if="${!#lists.isEmpty(bookRequests)}">
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Title</th>
-                <th>Summary</th>
-                <th>Category</th>
-                <th>Authors</th>
-                <th>Actions</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="book : ${bookRequests}">
-                <td th:text="${book.title}"></td>
-                <td th:text="${book.summary}"></td>
-                <td th:text="${book.bookCategory.name}"></td>
-                <td th:text="${#strings.join(book.bookAuthors, ', ')}"></td>
-                <td>
-                    <a th:href="@{/user/requestingUsers(bookId=${book.bookId})}" class="btn btn-primary">View Requests</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>
 </html>
