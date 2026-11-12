@@ -6,7 +6,7 @@ and owners decide who gets each book - with email notifications for everyone inv
 
 Built with **Java 17, Spring Boot 3, Spring Security, Thymeleaf and MySQL**, fully containerized with **Docker**.
 
-<img src="Screenshots/home.png" width="900" alt="Landing page">
+<img src="Screenshots/cover.png" width="900" alt="SocialBookstore">
 
 ## 🚀 Quick start
 
@@ -39,6 +39,9 @@ docker compose down -v   # stop and delete the database
 - **Responsive UI** - Bootstrap 5 design that works on desktop and mobile
 
 ## 🖼️ Screenshots
+
+### Landing page
+<img src="Screenshots/home.png" width="900" alt="Landing page">
 
 ### Dashboard
 <img src="Screenshots/dashboard.png" width="900" alt="Dashboard">
